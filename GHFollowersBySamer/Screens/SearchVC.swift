@@ -23,6 +23,7 @@ class SearchVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        view.addSubViews(logoImageView,userNameTextField,callToActionButton)
         configureLogoImageView()
         configureUserNameTextField()
         configureCallToActionButton()
@@ -31,13 +32,13 @@ class SearchVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        userNameTextField.text = ""
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     //MARK: ----------- Methods ---------------
     func creatDismissKeyboardTapGesture()  {
-        let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+        let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:)))
         view.addGestureRecognizer(tap)
     }
     
@@ -46,30 +47,29 @@ class SearchVC: UIViewController {
         guard isUsernameEntered else {
             self.presentGFAlertOnMainThread(title: "Empty Username", message: "we need a user need please", buttonTitle: "ok")
             return
-
         }
+        
+        userNameTextField.resignFirstResponder()
 
-      let followerListVC = FollowerListVC()
-        followerListVC.username = self.userNameTextField.text
-        followerListVC.title = self.userNameTextField.text
+      let followerListVC = FollowerListVC(username: self.userNameTextField.text!)
         navigationController?.pushViewController(followerListVC, animated: true)
     }
     
     //MARK: ----------- Confige ---------------
     private func configureLogoImageView(){
-        view.addSubview(logoImageView)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        logoImageView.image = UIImage(named: "gh-logo")
+        logoImageView.image = Images.ghLogo
+
+        let topPadding: CGFloat = DeviceTypes.isiPhone8Standard || DeviceTypes.isiPhone8Zoomed ? 20 : 80 //34an el keyboard by5fy  elt TF fe el iphone 8
         
         NSLayoutConstraint.activate([
-            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: topPadding),
             logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoImageView.heightAnchor.constraint(equalToConstant: 200),
             logoImageView.widthAnchor.constraint(equalToConstant: 200)
         ])
     }
     private func configureUserNameTextField(){
-        view.addSubview(userNameTextField)
         userNameTextField.delegate = self
         
         NSLayoutConstraint.activate([
@@ -81,7 +81,6 @@ class SearchVC: UIViewController {
         
     }
     private func  configureCallToActionButton(){
-        view.addSubview(callToActionButton)
         callToActionButton.addTarget(self, action: #selector(pushFolloweListVC), for: .touchUpInside)
         
         NSLayoutConstraint.activate([

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Follower: Codable {
+struct Follower: Codable ,Hashable{ //hashable 34an el  DiffableDataSource
     var login: String
     var avatarUrl: String
 }
